@@ -1,6 +1,7 @@
 package com.gym.gym_app.models;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -26,10 +27,19 @@ public class Usuario {
     @Column(nullable = false)
     private Rol rol;
 
-    // ===== Constructor vacío =====
+    // Relación 1:1 con la membresía
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private Membresia membresia;
+
+    // Relación 1:N con datos corporales
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<DatosCuerpo> datosCuerpo;
+
+    // Constructor vacío
     public Usuario() {}
 
     // ===== Getters y Setters =====
+
     public Integer getId() {
         return id;
     }
@@ -76,5 +86,21 @@ public class Usuario {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public Membresia getMembresia() {
+        return membresia;
+    }
+
+    public void setMembresia(Membresia membresia) {
+        this.membresia = membresia;
+    }
+
+    public List<DatosCuerpo> getDatosCuerpo() {
+        return datosCuerpo;
+    }
+
+    public void setDatosCuerpo(List<DatosCuerpo> datosCuerpo) {
+        this.datosCuerpo = datosCuerpo;
     }
 }
