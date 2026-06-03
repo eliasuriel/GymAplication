@@ -1,0 +1,55 @@
+package com.gym.gym_app.controller;
+
+import com.gym.gym_app.models.Rol;
+import com.gym.gym_app.models.Usuario;
+import com.gym.gym_app.security.JwtUtil;
+import com.gym.gym_app.security.LoginRequest;
+import com.gym.gym_app.security.LoginResponse;
+import com.gym.gym_app.service.UsuarioService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
+public class AuthController {
+
+    private final UsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    public AuthController(UsuarioService usuarioService,
+                          PasswordEncoder passwordEncoder,
+                          JwtUtil jwtUtil) {
+        this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        return usuarioService.getUsuarioByCorreo(request.getCorreo())
+                .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
+                .map(u -> {
+                    String token = jwtUtil.generarToken(u.getCorreo(), u.getRol().name());
+                    return ResponseEntity.ok((Object) new LoginResponse(token, u.getCorreo(), u.getRol().name()));
+                })
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas"));
+    }
+
+    @PostMapping("/registro")
+    public ResponseEntity<?> registro(@RequestBody Usuario usuario) {
+        if (usuarioService.existeCorreo(usuario.getCorreo())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya está registrado");
+        }
+        if (usuario.getRol() == null) {
+            usuario.setRol(Rol.CLIENTE);
+        }
+        Usuario nuevo = usuarioService.saveUsuario(usuario);
+        String token = jwtUtil.generarToken(nuevo.getCorreo(), nuevo.getRol().name());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new LoginResponse(token, nuevo.getCorreo(), nuevo.getRol().name()));
+    }
+}

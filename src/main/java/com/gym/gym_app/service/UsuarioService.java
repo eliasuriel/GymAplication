@@ -2,6 +2,7 @@ package com.gym.gym_app.service;
 
 import com.gym.gym_app.repository.UsuarioRepository;
 import com.gym.gym_app.models.Usuario;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +12,20 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public Usuario saveUsuario(Usuario usuario){
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        return usuarioRepository.save(usuario);
+    }
+
+    public boolean verificarPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     public List<Usuario> getAllUsuarios() {
@@ -26,10 +38,6 @@ public class UsuarioService {
 
     public Optional<Usuario> getUsuarioByCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo);
-    }
-
-    public Usuario saveUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
     }
 
     public void deleteUsuario(Long id) {
