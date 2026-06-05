@@ -1,9 +1,11 @@
 package com.gym.gym_app.service;
 
+import com.gym.gym_app.dto.UsuarioResponse;
 import com.gym.gym_app.repository.UsuarioRepository;
 import com.gym.gym_app.models.Usuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -46,5 +48,15 @@ public class UsuarioService {
 
     public boolean existeCorreo(String correo) {
         return usuarioRepository.existsByCorreo(correo);
+    }
+
+    public UsuarioResponse toResponse(Usuario usuario) {
+        return new UsuarioResponse(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getTelefono(),
+                usuario.getRol()
+        );
     }
 }

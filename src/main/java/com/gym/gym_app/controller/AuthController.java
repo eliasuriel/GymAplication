@@ -1,5 +1,6 @@
 package com.gym.gym_app.controller;
 
+import com.gym.gym_app.dto.UsuarioRequest;
 import com.gym.gym_app.models.Rol;
 import com.gym.gym_app.models.Usuario;
 import com.gym.gym_app.security.JwtUtil;
@@ -40,13 +41,17 @@ public class AuthController {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<?> registro(@RequestBody Usuario usuario) {
-        if (usuarioService.existeCorreo(usuario.getCorreo())) {
+    public ResponseEntity<?> registro(@RequestBody UsuarioRequest request) {
+        if (usuarioService.existeCorreo(request.getCorreo())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya está registrado");
         }
-        if (usuario.getRol() == null) {
-            usuario.setRol(Rol.CLIENTE);
-        }
+        Usuario usuario = new Usuario();
+        usuario.setNombre(request.getNombre());
+        usuario.setCorreo(request.getCorreo());
+        usuario.setPassword(request.getPassword());
+        usuario.setTelefono(request.getTelefono());
+        usuario.setRol(request.getRol() != null ? request.getRol() : Rol.CLIENTE);
+
         Usuario nuevo = usuarioService.saveUsuario(usuario);
         String token = jwtUtil.generarToken(nuevo.getCorreo(), nuevo.getRol().name());
         return ResponseEntity.status(HttpStatus.CREATED)

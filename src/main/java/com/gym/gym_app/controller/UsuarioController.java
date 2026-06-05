@@ -1,15 +1,18 @@
 package com.gym.gym_app.controller;
 
+import com.gym.gym_app.dto.UsuarioRequest;
+import com.gym.gym_app.dto.UsuarioResponse;
 import com.gym.gym_app.models.Usuario;
 import com.gym.gym_app.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "*") // para frontend después
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -18,31 +21,36 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // 🔹 Obtener todos los usuarios (ADMIN)
     @GetMapping
-    public List<Usuario> getAllUsuarios() {
-        return usuarioService.getAllUsuarios();
+    public List<UsuarioResponse> getAll() {
+        return usuarioService.getAllUsuarios()
+                .stream()
+                .map(usuarioService::toResponse)
+                .collect(Collectors.toList());
     }
 
-    // 🔹 Obtener usuario por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
         return usuarioService.getUsuarioById(id)
+                .map(usuarioService::toResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 🔹 Crear usuario
     @PostMapping
-    public Usuario crearUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.saveUsuario(usuario);
+    public ResponseEntity<UsuarioResponse> crear(@RequestBody UsuarioRequest request) {
+        Usuario usuario = new Usuario();
+        usuario.setNombre(request.getNombre());
+        usuario.setCorreo(request.getCorreo());
+        usuario.setPassword(request.getPassword());
+        usuario.setTelefono(request.getTelefono());
+        usuario.setRol(request.getRol());
+        return ResponseEntity.ok(usuarioService.toResponse(usuarioService.saveUsuario(usuario)));
     }
 
-    // 🔹 Eliminar usuario (ADMIN)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         usuarioService.deleteUsuario(id);
         return ResponseEntity.noContent().build();
     }
 }
-
