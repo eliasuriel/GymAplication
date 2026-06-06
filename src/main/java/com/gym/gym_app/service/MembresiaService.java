@@ -62,4 +62,12 @@ public class MembresiaService {
     public void deleteMembresia(Long id) {
         membresiaRepository.deleteById(id);
     }
+
+    public int verificarYMarcarVencidas() {
+        List<Membresia> vencidas = membresiaRepository
+                .findByActivaTrueAndFechaVencimientoBefore(java.time.LocalDate.now());
+        vencidas.forEach(m -> m.setActiva(false));
+        membresiaRepository.saveAll(vencidas);
+        return vencidas.size();
+    }
 }

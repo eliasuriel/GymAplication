@@ -37,4 +37,10 @@ public class MembresiaController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping("/verificar-vencimientos")
+    public ResponseEntity<String> verificarVencimientos() {
+        int cantidad = membresiaService.verificarYMarcarVencidas();
+        return ResponseEntity.ok("Se marcaron " + cantidad + " membresías como vencidas.");
+    }
 }
