@@ -9,30 +9,38 @@ public class Membresia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    private LocalDate fechaPago;
-
-    private LocalDate fechaVencimiento;
-
-    private Boolean activa = true;
-
-    // Relación: una membresía pertenece a un usuario
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    public Membresia() {}
+    @Column(name = "fecha_pago", nullable = false)
+    private LocalDate fechaPago;
 
-    // Getters y Setters
-    public Integer getId() {
-        return id;
-    }
+    @Column(name = "fecha_vencimiento", nullable = false)
+    private LocalDate fechaVencimiento;
 
-    public void setId(Integer id) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoMembresia tipo;
+
+    @Column(nullable = false)
+    private boolean activa;
+
+    public Long getId() {
+        return id; }
+
+    public void setId(Long id) {
         this.id = id;
     }
+    public Usuario getUsuario() {
+        return usuario;
+    }
 
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
     public LocalDate getFechaPago() {
         return fechaPago;
     }
@@ -49,19 +57,16 @@ public class Membresia {
         this.fechaVencimiento = fechaVencimiento;
     }
 
-    public Boolean getActiva() {
+    public TipoMembresia getTipo() {
+        return tipo;
+    }
+    public void setTipo(TipoMembresia tipo) {
+        this.tipo = tipo;
+    }
+    public boolean isActiva() {
         return activa;
     }
-
-    public void setActiva(Boolean activa) {
+    public void setActiva(boolean activa) {
         this.activa = activa;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
     }
 }

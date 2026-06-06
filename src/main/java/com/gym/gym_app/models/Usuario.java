@@ -2,6 +2,7 @@ package com.gym.gym_app.models;
 
 import jakarta.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "usuarios")
@@ -20,6 +21,7 @@ public class Usuario {
     @Column(length = 20)
     private String telefono;
 
+    @JsonIgnore
     @Column(nullable = false, length = 255)
     private String password;
 
@@ -27,11 +29,13 @@ public class Usuario {
     @Column(nullable = false)
     private Rol rol;
 
-    // Relación 1:1 con la membresía
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private Membresia membresia;
+    // Relación 1:to many con la membresía
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Membresia> membresias;
 
     // Relación 1:N con datos corporales
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<DatosCuerpo> datosCuerpo;
 
@@ -88,12 +92,11 @@ public class Usuario {
         this.rol = rol;
     }
 
-    public Membresia getMembresia() {
-        return membresia;
+    public List<Membresia> getMembresias() {
+        return membresias;
     }
-
-    public void setMembresia(Membresia membresia) {
-        this.membresia = membresia;
+    public void setMembresias(List<Membresia> membresias) {
+        this.membresias = membresias;
     }
 
     public List<DatosCuerpo> getDatosCuerpo() {
