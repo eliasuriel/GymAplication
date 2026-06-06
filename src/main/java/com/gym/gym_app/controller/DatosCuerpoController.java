@@ -2,6 +2,8 @@ package com.gym.gym_app.controller;
 
 import com.gym.gym_app.models.DatosCuerpo;
 import com.gym.gym_app.service.DatosCuerpoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,16 +19,22 @@ public class DatosCuerpoController {
         this.datosCuerpoService = datosCuerpoService;
     }
 
-    // 🔹 Historial corporal del usuario
-    @GetMapping("/usuario/{usuarioId}")
-    public List<DatosCuerpo> getHistorial(@PathVariable Long usuarioId) {
+    @PostMapping("/usuario/{usuarioId}")
+    public ResponseEntity<DatosCuerpo> guardar(@PathVariable Long usuarioId,
+                                               @RequestBody DatosCuerpo datos) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(datosCuerpoService.guardar(usuarioId, datos));
+    }
+
+    @GetMapping("/usuario/{usuarioId}/historial")
+    public List<DatosCuerpo> historial(@PathVariable Long usuarioId) {
         return datosCuerpoService.getHistorial(usuarioId);
     }
 
-    // 🔹 Registrar nuevo peso/medidas
-    @PostMapping
-    public DatosCuerpo guardarDatos(@RequestBody DatosCuerpo datosCuerpo) {
-        return datosCuerpoService.guardarDatos(datosCuerpo);
+    @GetMapping("/usuario/{usuarioId}/ultimo")
+    public ResponseEntity<DatosCuerpo> ultimo(@PathVariable Long usuarioId) {
+        return datosCuerpoService.getUltimo(usuarioId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
-

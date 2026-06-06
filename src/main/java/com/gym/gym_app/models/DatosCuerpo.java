@@ -1,7 +1,8 @@
 package com.gym.gym_app.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "datos_cuerpo")
@@ -9,67 +10,72 @@ public class DatosCuerpo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    private Double peso;      // DECIMAL(5,2)
-    private Double altura;    // DECIMAL(5,2)
-    private Double cintura;   // DECIMAL(5,2)
-
-    @Column(name = "fecha_registro")
-    private LocalDateTime fechaRegistro = LocalDateTime.now();
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
 
-    public DatosCuerpo() {}
+    private Double peso;      // kg
+    private Double altura;    // metros
+    private Double cintura;   // cm (opcional)
+    private Double imc;
+    private String categoria;
 
-    // Getters y Setters
-    public Integer getId() {
-        return id;
+    @Column(name = "fecha_registro")
+    private LocalDate fechaRegistro;
+
+    @PrePersist
+    @PreUpdate
+    public void calcularImc() {
+        if (peso != null && altura != null && altura > 0) {
+            this.imc = Math.round((peso / (altura * altura)) * 100.0) / 100.0;
+            this.categoria = interpretarImc(this.imc);
+        }
+        if (this.fechaRegistro == null) {
+            this.fechaRegistro = LocalDate.now();
+        }
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    private String interpretarImc(double imc) {
+        if (imc < 18.5) return "Bajo peso";
+        if (imc < 25.0) return "Peso normal";
+        if (imc < 30.0) return "Sobrepeso";
+        if (imc < 35.0) return "Obesidad grado I";
+        if (imc < 40.0) return "Obesidad grado II";
+        return "Obesidad grado III";
     }
 
-    public Double getPeso() {
-        return peso;
-    }
+    public Long getId() { return id; }
 
-    public void setPeso(Double peso) {
-        this.peso = peso;
-    }
+    public void setId(Long id) { this.id = id; }
 
-    public Double getAltura() {
-        return altura;
-    }
+    public Usuario getUsuario() { return usuario; }
 
-    public void setAltura(Double altura) {
-        this.altura = altura;
-    }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
-    public Double getCintura() {
-        return cintura;
-    }
+    public Double getPeso() { return peso; }
 
-    public void setCintura(Double cintura) {
-        this.cintura = cintura;
-    }
+    public void setPeso(Double peso) { this.peso = peso; }
 
-    public LocalDateTime getFechaRegistro() {
-        return fechaRegistro;
-    }
+    public Double getAltura() { return altura; }
 
-    public void setFechaRegistro(LocalDateTime fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
+    public void setAltura(Double altura) { this.altura = altura; }
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+    public Double getCintura() { return cintura; }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+    public void setCintura(Double cintura) { this.cintura = cintura; }
+
+    public Double getImc() { return imc; }
+
+    public void setImc(Double imc) { this.imc = imc; }
+
+    public String getCategoria() { return categoria; }
+
+    public void setCategoria(String categoria) { this.categoria = categoria; }
+
+    public LocalDate getFechaRegistro() { return fechaRegistro; }
+
+    public void setFechaRegistro(LocalDate fechaRegistro) { this.fechaRegistro = fechaRegistro; }
 }
