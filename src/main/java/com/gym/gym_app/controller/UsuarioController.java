@@ -4,8 +4,10 @@ import com.gym.gym_app.dto.UsuarioRequest;
 import com.gym.gym_app.dto.UsuarioResponse;
 import com.gym.gym_app.models.Usuario;
 import com.gym.gym_app.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +36,11 @@ public class UsuarioController {
         return usuarioService.getUsuarioById(id)
                 .map(usuarioService::toResponse)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new EntityNotFoundException("Usuario con id " + id + " no encontrado"));
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponse> crear(@RequestBody UsuarioRequest request) {
+    public ResponseEntity<UsuarioResponse> crear(@Valid @RequestBody UsuarioRequest request) {
         Usuario usuario = new Usuario();
         usuario.setNombre(request.getNombre());
         usuario.setCorreo(request.getCorreo());
