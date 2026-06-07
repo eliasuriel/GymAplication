@@ -59,4 +59,10 @@ public class UsuarioService {
                 usuario.getRol()
         );
     }
+
+    public String getCorreoById(Long id) {
+        return usuarioRepository.findById(id)
+                .map(Usuario::getCorreo)
+                .orElse("");
+    }
 }

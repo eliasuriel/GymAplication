@@ -5,6 +5,7 @@ import com.gym.gym_app.service.AsistenciaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -20,22 +21,26 @@ public class AsistenciaController {
     }
 
     @PostMapping("/entrada/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public ResponseEntity<Asistencia> entrada(@PathVariable Long usuarioId) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(asistenciaService.registrarEntrada(usuarioId));
     }
 
     @PutMapping("/salida/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public ResponseEntity<Asistencia> salida(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(asistenciaService.registrarSalida(usuarioId));
     }
 
     @GetMapping("/usuario/{usuarioId}/historial")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public List<Asistencia> historial(@PathVariable Long usuarioId) {
         return asistenciaService.getHistorial(usuarioId);
     }
 
     @GetMapping("/hoy")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Asistencia> hoy() {
         return asistenciaService.getAsistenciasHoy();
     }

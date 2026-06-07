@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class UsuarioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UsuarioResponse> getAll() {
         return usuarioService.getAllUsuarios()
                 .stream()
@@ -32,6 +34,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#id)")
     public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
         return usuarioService.getUsuarioById(id)
                 .map(usuarioService::toResponse)
@@ -40,6 +43,7 @@ public class UsuarioController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioResponse> crear(@Valid @RequestBody UsuarioRequest request) {
         Usuario usuario = new Usuario();
         usuario.setNombre(request.getNombre());
@@ -51,6 +55,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         usuarioService.deleteUsuario(id);
         return ResponseEntity.noContent().build();

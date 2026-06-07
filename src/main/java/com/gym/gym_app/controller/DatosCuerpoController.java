@@ -5,6 +5,8 @@ import com.gym.gym_app.service.DatosCuerpoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class DatosCuerpoController {
     }
 
     @PostMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public ResponseEntity<DatosCuerpo> guardar(@PathVariable Long usuarioId,
                                                @RequestBody DatosCuerpo datos) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -27,11 +30,13 @@ public class DatosCuerpoController {
     }
 
     @GetMapping("/usuario/{usuarioId}/historial")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public List<DatosCuerpo> historial(@PathVariable Long usuarioId) {
         return datosCuerpoService.getHistorial(usuarioId);
     }
 
     @GetMapping("/usuario/{usuarioId}/ultimo")
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public ResponseEntity<DatosCuerpo> ultimo(@PathVariable Long usuarioId) {
         return datosCuerpoService.getUltimo(usuarioId)
                 .map(ResponseEntity::ok)
