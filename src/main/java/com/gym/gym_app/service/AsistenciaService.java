@@ -6,6 +6,8 @@ import com.gym.gym_app.repository.MembresiaRepository;
 import com.gym.gym_app.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +19,7 @@ public class AsistenciaService {
     private final AsistenciaRepository asistenciaRepository;
     private final UsuarioRepository usuarioRepository;
     private final MembresiaRepository membresiaRepository;
+    private static final Logger log = LoggerFactory.getLogger(AsistenciaService.class);
 
     public AsistenciaService(AsistenciaRepository asistenciaRepository,
                              UsuarioRepository usuarioRepository,
@@ -66,5 +69,18 @@ public class AsistenciaService {
         LocalDateTime inicioDia = LocalDate.now().atStartOfDay();
         LocalDateTime finDia = inicioDia.plusDays(1);
         return asistenciaRepository.findByFechaEntradaBetween(inicioDia, finDia);
+    }
+
+    public void registrarSalidasAutomaticas() {
+        LocalDateTime haceDosHoras = LocalDateTime.now().minusHours(2);
+        List<Asistencia> sinSalida = asistenciaRepository
+                .findByFechaSalidaIsNullAndFechaEntradaBefore(haceDosHoras);
+
+        if (sinSalida.isEmpty()) return;
+
+        sinSalida.forEach(a -> a.setFechaSalida(LocalDateTime.now()));
+        asistenciaRepository.saveAll(sinSalida);
+
+        log.info("Se registraron {} salidas automáticas.", sinSalida.size());
     }
 }
