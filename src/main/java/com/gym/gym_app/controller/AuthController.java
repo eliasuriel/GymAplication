@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -57,5 +58,23 @@ public class AuthController {
         String token = jwtUtil.generarToken(nuevo.getCorreo(), nuevo.getRol().name());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new LoginResponse(token, nuevo.getCorreo(), nuevo.getRol().name(), nuevo.getId()));
+    }
+
+    @PostMapping("/login-id")
+    public ResponseEntity<?> loginConId(@RequestBody Map<String, Long> body) {
+        Long usuarioId = body.get("usuarioId");
+        if (usuarioId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID es obligatorio");
+        }
+
+        return usuarioService.getUsuarioById(usuarioId)
+                .filter(u -> u.getRol() == Rol.CLIENTE)
+                .map(u -> {
+                    String token = jwtUtil.generarToken(u.getCorreo(), u.getRol().name());
+                    return ResponseEntity.ok((Object) new LoginResponse(
+                            token, u.getCorreo(), u.getRol().name(), u.getId()));
+                })
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("ID de cliente no encontrado"));
     }
 }
