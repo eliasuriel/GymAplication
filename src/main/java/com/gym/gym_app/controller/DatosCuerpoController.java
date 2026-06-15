@@ -42,4 +42,12 @@ public class DatosCuerpoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping("/admin/usuario/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DatosCuerpo> guardarComoAdmin(@PathVariable Long usuarioId,
+                                                        @RequestBody DatosCuerpo datos) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(datosCuerpoService.guardar(usuarioId, datos));
+    }
 }

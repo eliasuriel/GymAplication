@@ -17,11 +17,23 @@ public class DatosCuerpo {
     @JsonIgnore
     private Usuario usuario;
 
-    private Double peso;      // kg
-    private Double altura;    // metros
-    private Double cintura;   // cm (opcional)
+    // Composición corporal
+    private Double peso;
+    private Double altura;
     private Double imc;
     private String categoria;
+    private Double musculo;
+    private Double grasaCorporal;
+    private Double grasaVisceral;
+    private Integer edadMetabolica;
+
+    // Medidas corporales
+    private Double busto;
+    private Double cintura;
+    private Double abdomen;
+    private Double cadera;
+    private Double muslo;
+    private Double brazo;
 
     @Column(name = "fecha_registro")
     private LocalDate fechaRegistro;
@@ -48,34 +60,37 @@ public class DatosCuerpo {
     }
 
     public Long getId() { return id; }
-
     public void setId(Long id) { this.id = id; }
-
     public Usuario getUsuario() { return usuario; }
-
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
-
     public Double getPeso() { return peso; }
-
     public void setPeso(Double peso) { this.peso = peso; }
-
     public Double getAltura() { return altura; }
-
     public void setAltura(Double altura) { this.altura = altura; }
-
-    public Double getCintura() { return cintura; }
-
-    public void setCintura(Double cintura) { this.cintura = cintura; }
-
     public Double getImc() { return imc; }
-
     public void setImc(Double imc) { this.imc = imc; }
-
     public String getCategoria() { return categoria; }
-
     public void setCategoria(String categoria) { this.categoria = categoria; }
-
+    public Double getMusculo() { return musculo; }
+    public void setMusculo(Double musculo) { this.musculo = musculo; }
+    public Double getGrasaCorporal() { return grasaCorporal; }
+    public void setGrasaCorporal(Double grasaCorporal) { this.grasaCorporal = grasaCorporal; }
+    public Double getGrasaVisceral() { return grasaVisceral; }
+    public void setGrasaVisceral(Double grasaVisceral) { this.grasaVisceral = grasaVisceral; }
+    public Integer getEdadMetabolica() { return edadMetabolica; }
+    public void setEdadMetabolica(Integer edadMetabolica) { this.edadMetabolica = edadMetabolica; }
+    public Double getBusto() { return busto; }
+    public void setBusto(Double busto) { this.busto = busto; }
+    public Double getCintura() { return cintura; }
+    public void setCintura(Double cintura) { this.cintura = cintura; }
+    public Double getAbdomen() { return abdomen; }
+    public void setAbdomen(Double abdomen) { this.abdomen = abdomen; }
+    public Double getCadera() { return cadera; }
+    public void setCadera(Double cadera) { this.cadera = cadera; }
+    public Double getMuslo() { return muslo; }
+    public void setMuslo(Double muslo) { this.muslo = muslo; }
+    public Double getBrazo() { return brazo; }
+    public void setBrazo(Double brazo) { this.brazo = brazo; }
     public LocalDate getFechaRegistro() { return fechaRegistro; }
-
     public void setFechaRegistro(LocalDate fechaRegistro) { this.fechaRegistro = fechaRegistro; }
 }
