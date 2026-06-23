@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/datos-cuerpo")
@@ -41,6 +42,12 @@ public class DatosCuerpoController {
         return datosCuerpoService.getUltimo(usuarioId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/reporte/mensual")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Map<String, Object>>> reporteMensual() {
+        return ResponseEntity.ok(datosCuerpoService.reporteProgresoMensual());
     }
 
     @PostMapping("/admin/usuario/{usuarioId}")
