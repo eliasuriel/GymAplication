@@ -56,7 +56,8 @@ public class MembresiaService {
     }
 
     public Optional<Membresia> getMembresiaActiva(Long usuarioId) {
-        return membresiaRepository.findByUsuarioIdAndActivaTrue(usuarioId);
+        return membresiaRepository.findByUsuarioIdAndActivaTrue(usuarioId)
+                .filter(m -> !m.getFechaVencimiento().isBefore(LocalDate.now()));
     }
 
     public void deleteMembresia(Long id) {
