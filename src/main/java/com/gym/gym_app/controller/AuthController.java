@@ -37,7 +37,7 @@ public class AuthController {
                 .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
                 .map(u -> {
                     String token = jwtUtil.generarToken(u.getCorreo(), u.getRol().name());
-                    return ResponseEntity.ok((Object) new LoginResponse(token, u.getCorreo(), u.getRol().name(), u.getId()));
+                    return ResponseEntity.ok((Object) new LoginResponse(token, u.getCorreo(), u.getRol().name(), u.getId(),u.getFoto()));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas"));
     }
@@ -57,7 +57,7 @@ public class AuthController {
         Usuario nuevo = usuarioService.saveUsuario(usuario);
         String token = jwtUtil.generarToken(nuevo.getCorreo(), nuevo.getRol().name());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new LoginResponse(token, nuevo.getCorreo(), nuevo.getRol().name(), nuevo.getId()));
+                .body(new LoginResponse(token, nuevo.getCorreo(), nuevo.getRol().name(), nuevo.getId(),nuevo.getFoto()));
     }
 
     @PostMapping("/login-id")
@@ -72,7 +72,7 @@ public class AuthController {
                 .map(u -> {
                     String token = jwtUtil.generarToken(u.getCorreo(), u.getRol().name());
                     return ResponseEntity.ok((Object) new LoginResponse(
-                            token, u.getCorreo(), u.getRol().name(), u.getId()));
+                            token, u.getCorreo(), u.getRol().name(), u.getId(), u.getFoto()));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("ID de cliente no encontrado"));

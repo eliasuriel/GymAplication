@@ -8,13 +8,15 @@ public class UsuarioResponse {
     private String correo;
     private String telefono;
     private Rol rol;
+    private String foto;
 
-    public UsuarioResponse(Long id, String nombre, String correo, String telefono, Rol rol) {
+    public UsuarioResponse(Long id, String nombre, String correo, String telefono, Rol rol,String foto) {
         this.id = id;
         this.nombre = nombre;
         this.correo = correo;
         this.telefono = telefono;
         this.rol = rol;
+        this.foto = foto;
     }
 
     public Long getId() {
@@ -34,5 +36,9 @@ public class UsuarioResponse {
 
     public Rol getRol() {
         return rol;
+    }
+
+    public String getFoto(){
+        return foto;
     }
 }

@@ -33,6 +33,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/fotos/**").permitAll()
                         .requestMatchers("/api/usuarios/**").authenticated()
                         .requestMatchers("/api/membresias/**").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers("/api/datos-cuerpo/**").hasAnyRole("ADMIN", "CLIENTE")

@@ -56,7 +56,8 @@ public class UsuarioService {
                 usuario.getNombre(),
                 usuario.getCorreo(),
                 usuario.getTelefono(),
-                usuario.getRol()
+                usuario.getRol(),
+                usuario.getFoto()
         );
     }
 
@@ -64,5 +65,12 @@ public class UsuarioService {
         return usuarioRepository.findById(id)
                 .map(Usuario::getCorreo)
                 .orElse("");
+    }
+
+    public void actualizarFoto(Long id, String nombreFoto){
+        usuarioRepository.findById(id).ifPresent(u -> {
+            u.setFoto(nombreFoto);
+            usuarioRepository.save(u);
+        });
     }
 }

@@ -21,6 +21,9 @@ public class Usuario {
     @Column(length = 20)
     private String telefono;
 
+    @Column(name = "foto")
+    private String foto;
+
     @JsonIgnore
     @Column(nullable = false, length = 255)
     private String password;
@@ -105,5 +108,13 @@ public class Usuario {
 
     public void setDatosCuerpo(List<DatosCuerpo> datosCuerpo) {
         this.datosCuerpo = datosCuerpo;
+    }
+
+    public String getFoto(){
+        return foto;
+    }
+
+    public void setFoto(String foto){
+        this.foto = foto;
     }
 }
