@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/asistencias")
@@ -37,6 +38,12 @@ public class AsistenciaController {
     @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public List<Asistencia> historial(@PathVariable Long usuarioId) {
         return asistenciaService.getHistorial(usuarioId);
+    }
+
+    @GetMapping("/reporte/inasistencia")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Map<String, Object>> reporteInasistencia(@RequestParam(defaultValue = "7") int dias) {
+        return asistenciaService.reporteInasistencia(dias);
     }
 
     @GetMapping("/hoy")

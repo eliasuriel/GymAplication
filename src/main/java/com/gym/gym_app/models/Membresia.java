@@ -1,6 +1,7 @@
 package com.gym.gym_app.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -27,6 +28,11 @@ public class Membresia {
 
     @Column(nullable = false)
     private boolean activa;
+
+    // Precio cobrado en este pago. Se guarda por membresía para conservar el historial
+    // aunque el precio cambie en el futuro.
+    @Column(precision = 10, scale = 2)
+    private BigDecimal precio;
 
     public Long getId() {
         return id; }
@@ -62,6 +68,12 @@ public class Membresia {
     }
     public void setTipo(TipoMembresia tipo) {
         this.tipo = tipo;
+    }
+    public BigDecimal getPrecio() {
+        return precio;
+    }
+    public void setPrecio(BigDecimal precio) {
+        this.precio = precio;
     }
     public boolean isActiva() {
         return activa;

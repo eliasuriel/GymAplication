@@ -3,9 +3,13 @@ package com.gym.gym_app.dto;
 import com.gym.gym_app.models.Rol;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public class UsuarioRequest {
+
+    @Positive(message = "El ID debe ser un número mayor a 0")
+    private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
@@ -20,6 +24,10 @@ public class UsuarioRequest {
 
     private String telefono;
     private Rol rol;
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

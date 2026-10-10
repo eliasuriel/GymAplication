@@ -23,6 +23,12 @@ public class MembresiaService {
     }
 
     public Membresia crearMembresia(Long usuarioId, Membresia membresia) {
+        if (membresia.getTipo() == null) {
+            throw new IllegalArgumentException("El tipo de membresía es obligatorio");
+        }
+        if (membresia.getPrecio() == null || membresia.getPrecio().signum() <= 0) {
+            throw new IllegalArgumentException("El precio es obligatorio y debe ser mayor a 0");
+        }
         // Verificar que el usuario existe
         usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario con id " + usuarioId + " no encontrado"));

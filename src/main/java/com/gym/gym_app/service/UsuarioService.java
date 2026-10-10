@@ -22,6 +22,11 @@ public class UsuarioService {
     }
 
     public Usuario saveUsuario(Usuario usuario){
+        if (usuario.getId() == null) {
+            usuario.setId(usuarioRepository.findMaxId() + 1);
+        } else if (usuarioRepository.existsById(usuario.getId())) {
+            throw new IllegalArgumentException("El ID " + usuario.getId() + " ya está asignado a otro usuario");
+        }
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }

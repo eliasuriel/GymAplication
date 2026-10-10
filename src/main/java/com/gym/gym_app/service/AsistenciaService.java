@@ -1,6 +1,9 @@
 package com.gym.gym_app.service;
 
 import com.gym.gym_app.models.Asistencia;
+import com.gym.gym_app.models.Membresia;
+import com.gym.gym_app.models.Rol;
+import com.gym.gym_app.models.Usuario;
 import com.gym.gym_app.repository.AsistenciaRepository;
 import com.gym.gym_app.repository.MembresiaRepository;
 import com.gym.gym_app.repository.UsuarioRepository;
@@ -11,7 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 public class AsistenciaService {
@@ -69,6 +73,65 @@ public class AsistenciaService {
         LocalDateTime inicioDia = LocalDate.now().atStartOfDay();
         LocalDateTime finDia = inicioDia.plusDays(1);
         return asistenciaRepository.findByFechaEntradaBetween(inicioDia, finDia);
+    }
+
+    /**
+     * Clientas que llevan {@code dias} días o más sin asistir (o que nunca han asistido).
+     * Ordenadas de mayor a menor inactividad; las que nunca han venido van primero.
+     */
+    public List<Map<String, Object>> reporteInasistencia(int dias) {
+        if (dias < 1) {
+            throw new IllegalArgumentException("El número de días debe ser mayor o igual a 1");
+        }
+
+        LocalDate hoy = LocalDate.now();
+
+        // usuarioId -> fecha de su última entrada
+        Map<Long, LocalDate> ultimaEntrada = new HashMap<>();
+        for (Object[] fila : asistenciaRepository.findUltimaEntradaPorUsuario()) {
+            ultimaEntrada.put((Long) fila[0], ((LocalDateTime) fila[1]).toLocalDate());
+        }
+
+        // usuarioId -> vencimiento de su membresía vigente
+        Map<Long, LocalDate> vencimientos = new HashMap<>();
+        for (Membresia m : membresiaRepository.findByActivaTrue()) {
+            if (!m.getFechaVencimiento().isBefore(hoy)) {
+                vencimientos.put(m.getUsuario().getId(), m.getFechaVencimiento());
+            }
+        }
+
+        List<Map<String, Object>> resultado = new ArrayList<>();
+        for (Usuario u : usuarioRepository.findAll()) {
+            if (u.getRol() != Rol.CLIENTE) continue;
+
+            LocalDate ultima = ultimaEntrada.get(u.getId());
+            Long diasSin = ultima == null ? null : ChronoUnit.DAYS.between(ultima, hoy);
+
+            // Se incluye si nunca ha asistido o si ya pasaron al menos 'dias' días
+            if (diasSin != null && diasSin < dias) continue;
+
+            Map<String, Object> fila = new LinkedHashMap<>();
+            fila.put("usuarioId", u.getId());
+            fila.put("nombre", u.getNombre());
+            fila.put("telefono", u.getTelefono());
+            fila.put("ultimaAsistencia", ultima);          // null = nunca ha asistido
+            fila.put("diasSinAsistir", diasSin);           // null = nunca ha asistido
+            fila.put("membresiaActiva", vencimientos.containsKey(u.getId()));
+            fila.put("fechaVencimiento", vencimientos.get(u.getId()));
+            resultado.add(fila);
+        }
+
+        // Nunca asistieron primero; después, de más a menos días sin asistir
+        resultado.sort((a, b) -> {
+            Long da = (Long) a.get("diasSinAsistir");
+            Long db = (Long) b.get("diasSinAsistir");
+            if (da == null && db == null) return 0;
+            if (da == null) return -1;
+            if (db == null) return 1;
+            return Long.compare(db, da);
+        });
+
+        return resultado;
     }
 
     public void registrarSalidasAutomaticas() {
