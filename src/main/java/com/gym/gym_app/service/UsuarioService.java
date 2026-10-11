@@ -7,6 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import jakarta.persistence.EntityNotFoundException;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,8 +65,16 @@ public class UsuarioService {
                 usuario.getCorreo(),
                 usuario.getTelefono(),
                 usuario.getRol(),
-                usuario.getFoto()
+                usuario.getFoto(),
+                usuario.getFechaNacimiento()
         );
+    }
+
+    public Usuario actualizarFechaNacimiento(Long id, LocalDate fechaNacimiento) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario con id " + id + " no encontrado"));
+        usuario.setFechaNacimiento(fechaNacimiento);
+        return usuarioRepository.save(usuario);
     }
 
     public String getCorreoById(Long id) {

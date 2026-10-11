@@ -1,6 +1,7 @@
 package com.gym.gym_app.models;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "usuarios")
 public class Usuario {
 
+    // El ID lo asigna el admin al crear al usuario (si no se manda, el service asigna el siguiente)
     @Id
     private Long id;
 
@@ -22,6 +24,9 @@ public class Usuario {
 
     @Column(name = "foto")
     private String foto;
+
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
 
     @JsonIgnore
     @Column(nullable = false, length = 255)
@@ -68,6 +73,14 @@ public class Usuario {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     public String getTelefono() {

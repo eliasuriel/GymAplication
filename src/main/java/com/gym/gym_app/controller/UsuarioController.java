@@ -1,5 +1,6 @@
 package com.gym.gym_app.controller;
 
+import com.gym.gym_app.dto.FechaNacimientoRequest;
 import com.gym.gym_app.dto.UsuarioRequest;
 import com.gym.gym_app.dto.UsuarioResponse;
 import com.gym.gym_app.models.Usuario;
@@ -51,8 +52,17 @@ public class UsuarioController {
         usuario.setCorreo(request.getCorreo());
         usuario.setPassword(request.getPassword());
         usuario.setTelefono(request.getTelefono());
+        usuario.setFechaNacimiento(request.getFechaNacimiento());
         usuario.setRol(request.getRol());
         return ResponseEntity.ok(usuarioService.toResponse(usuarioService.saveUsuario(usuario)));
+    }
+
+    @PutMapping("/{id}/fecha-nacimiento")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UsuarioResponse> actualizarFechaNacimiento(@PathVariable Long id,
+                                                                     @Valid @RequestBody FechaNacimientoRequest request) {
+        Usuario actualizado = usuarioService.actualizarFechaNacimiento(id, request.getFechaNacimiento());
+        return ResponseEntity.ok(usuarioService.toResponse(actualizado));
     }
 
     @DeleteMapping("/{id}")

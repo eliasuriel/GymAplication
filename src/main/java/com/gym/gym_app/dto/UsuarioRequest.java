@@ -3,8 +3,11 @@ package com.gym.gym_app.dto;
 import com.gym.gym_app.models.Rol;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 
 public class UsuarioRequest {
 
@@ -24,6 +27,13 @@ public class UsuarioRequest {
 
     private String telefono;
     private Rol rol;
+
+    @PastOrPresent(message = "La fecha de nacimiento no puede ser futura")
+    private LocalDate fechaNacimiento;
+
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
     public Long getId() { return id; }
 

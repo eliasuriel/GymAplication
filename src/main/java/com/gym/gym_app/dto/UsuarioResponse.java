@@ -2,6 +2,8 @@ package com.gym.gym_app.dto;
 
 import com.gym.gym_app.models.Rol;
 
+import java.time.LocalDate;
+
 public class UsuarioResponse {
     private Long id;
     private String nombre;
@@ -9,14 +11,16 @@ public class UsuarioResponse {
     private String telefono;
     private Rol rol;
     private String foto;
+    private LocalDate fechaNacimiento;
 
-    public UsuarioResponse(Long id, String nombre, String correo, String telefono, Rol rol,String foto) {
+    public UsuarioResponse(Long id, String nombre, String correo, String telefono, Rol rol, String foto, LocalDate fechaNacimiento) {
         this.id = id;
         this.nombre = nombre;
         this.correo = correo;
         this.telefono = telefono;
         this.rol = rol;
         this.foto = foto;
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     public Long getId() {
@@ -40,5 +44,9 @@ public class UsuarioResponse {
 
     public String getFoto(){
         return foto;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
     }
 }
