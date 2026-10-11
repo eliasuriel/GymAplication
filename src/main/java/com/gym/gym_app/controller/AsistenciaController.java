@@ -1,7 +1,9 @@
 package com.gym.gym_app.controller;
 
+import com.gym.gym_app.dto.AsistenciaManualRequest;
 import com.gym.gym_app.models.Asistencia;
 import com.gym.gym_app.service.AsistenciaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +30,25 @@ public class AsistenciaController {
                 .body(asistenciaService.registrarEntrada(usuarioId));
     }
 
+    @PostMapping("/manual")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Asistencia> registrarManual(@Valid @RequestBody AsistenciaManualRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(asistenciaService.registrarAsistenciaManual(
+                        request.getUsuarioId(), request.getFecha(), request.getHora()));
+    }
+
     @PutMapping("/salida/{usuarioId}")
     @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getCorreoById(#usuarioId)")
     public ResponseEntity<Asistencia> salida(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(asistenciaService.registrarSalida(usuarioId));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        asistenciaService.eliminarAsistencia(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/usuario/{usuarioId}/historial")

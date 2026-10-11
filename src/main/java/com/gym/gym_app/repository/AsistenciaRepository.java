@@ -16,6 +16,8 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
 
     List<Asistencia> findByFechaEntradaBetween(LocalDateTime inicio, LocalDateTime fin);
 
+    boolean existsByUsuarioIdAndFechaEntradaBetween(Long usuarioId, LocalDateTime inicio, LocalDateTime fin);
+
     List<Asistencia> findByFechaSalidaIsNullAndFechaEntradaBefore(LocalDateTime fecha);
 
     // [usuarioId, fecha de su última entrada] por cada usuario que ha asistido alguna vez

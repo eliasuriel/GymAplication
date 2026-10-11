@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -53,6 +54,53 @@ public class AsistenciaService {
         Asistencia asistencia = new Asistencia();
         asistencia.setUsuario(usuarioRepository.findById(usuarioId).get());
         return asistenciaRepository.save(asistencia);
+    }
+
+    /**
+     * Registro manual hecho por el administrador cuando una clienta olvidó registrar su asistencia.
+     * La entrada y la salida quedan en la misma fecha y hora, para no inventar una duración.
+     */
+    public Asistencia registrarAsistenciaManual(Long usuarioId, LocalDate fecha, LocalTime hora) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Usuario con id " + usuarioId + " no encontrado"));
+
+        if (usuario.getRol() != Rol.CLIENTE) {
+            throw new IllegalArgumentException("Solo se pueden registrar asistencias a clientas");
+        }
+
+        LocalDateTime momento = LocalDateTime.of(fecha, hora != null ? hora : LocalTime.NOON);
+        if (momento.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("No se puede registrar una asistencia en el futuro");
+        }
+
+        // Debía tener una membresía vigente ese día
+        boolean tenia = membresiaRepository.findByUsuarioId(usuarioId).stream()
+                .anyMatch(m -> !fecha.isBefore(m.getFechaPago()) && !fecha.isAfter(m.getFechaVencimiento()));
+        if (!tenia) {
+            throw new IllegalArgumentException("La clienta no tenía una membresía vigente el " + fecha);
+        }
+
+        // Evitar duplicar un día que ya tiene asistencia
+        LocalDateTime inicioDia = fecha.atStartOfDay();
+        if (asistenciaRepository.existsByUsuarioIdAndFechaEntradaBetween(usuarioId, inicioDia, inicioDia.plusDays(1))) {
+            throw new IllegalArgumentException("La clienta ya tiene una asistencia registrada el " + fecha);
+        }
+
+        Asistencia asistencia = new Asistencia();
+        asistencia.setUsuario(usuario);
+        asistencia.setFechaEntrada(momento);
+        asistencia.setFechaSalida(momento);
+        return asistenciaRepository.save(asistencia);
+    }
+
+    public void eliminarAsistencia(Long asistenciaId) {
+        Asistencia asistencia = asistenciaRepository.findById(asistenciaId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Asistencia con id " + asistenciaId + " no encontrada"));
+        asistenciaRepository.delete(asistencia);
+        log.info("Asistencia {} eliminada (usuario {}, entrada {})",
+                asistenciaId, asistencia.getUsuario().getId(), asistencia.getFechaEntrada());
     }
 
     public Asistencia registrarSalida(Long usuarioId) {
