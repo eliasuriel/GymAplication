@@ -8,6 +8,7 @@ public class LoginResponse {
     private String rol;
     private Long id;
     private String foto;
+    private String nombre;
     private LocalDate fechaNacimiento;
 
     public LoginResponse(String token, String correo, String rol, Long id, String foto) {
@@ -15,6 +16,11 @@ public class LoginResponse {
     }
 
     public LoginResponse(String token, String correo, String rol, Long id, String foto, LocalDate fechaNacimiento) {
+        this(token, correo, rol, id, foto, fechaNacimiento, null);
+    }
+
+    public LoginResponse(String token, String correo, String rol, Long id, String foto, LocalDate fechaNacimiento, String nombre) {
+        this.nombre = nombre;
         this.token = token;
         this.correo = correo;
         this.rol = rol;
@@ -28,5 +34,6 @@ public class LoginResponse {
     public String getRol() { return rol; }
     public Long getId() { return id; }
     public String getFoto(){return foto;}
+    public String getNombre() { return nombre; }
     public LocalDate getFechaNacimiento() { return fechaNacimiento; }
 }

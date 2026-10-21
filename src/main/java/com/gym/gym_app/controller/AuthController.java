@@ -51,7 +51,7 @@ public class AuthController {
                 .map(u -> {
                     String token = jwtUtil.generarToken(u.getCorreo(), u.getRol().name());
                     return ResponseEntity.ok((Object) new LoginResponse(
-                            token, u.getCorreo(), u.getRol().name(), u.getId(), u.getFoto(), u.getFechaNacimiento()));
+                            token, u.getCorreo(), u.getRol().name(), u.getId(), u.getFoto(), u.getFechaNacimiento(), u.getNombre()));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("ID de cliente no encontrado"));
