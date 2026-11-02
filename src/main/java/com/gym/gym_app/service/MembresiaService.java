@@ -41,12 +41,30 @@ public class MembresiaService {
             throw new IllegalArgumentException("La fecha de inicio no puede ser futura");
         }
 
-        // Calcular vencimiento según tipo, a partir de la fecha de inicio
+        // La fecha de pago real se conserva para el historial. Si se renueva
+        // entre 1 y 7 días naturales después del vencimiento anterior,
+        // el nuevo periodo comienza en el vencimiento anterior.
+        // Se consulta TODO el historial porque la membresía anterior puede estar inactiva.
+        LocalDate inicioPeriodo = inicio;
+        Optional<Membresia> anterior = membresiaRepository.findByUsuarioId(usuarioId).stream()
+                .filter(m -> m.getFechaPago() != null && !m.getFechaPago().isAfter(inicio))
+                .filter(m -> m.getFechaVencimiento() != null)
+                .max(Comparator.comparing(Membresia::getFechaPago)
+                        .thenComparing(Membresia::getFechaVencimiento));
+
+        if (anterior.isPresent()) {
+            LocalDate vencimientoAnterior = anterior.get().getFechaVencimiento();
+            if (!inicio.isBefore(vencimientoAnterior)
+                    && !inicio.isAfter(vencimientoAnterior.plusDays(7))) {
+                inicioPeriodo = vencimientoAnterior;
+            }
+        }
+
         LocalDate vencimiento = switch (membresia.getTipo()) {
-            case MENSUAL -> inicio.plusMonths(1);
-            case TRIMESTRAL -> inicio.plusMonths(3);
-            case SEMESTRAL -> inicio.plusMonths(6);
-            case ANUAL -> inicio.plusYears(1);
+            case MENSUAL -> inicioPeriodo.plusMonths(1);
+            case TRIMESTRAL -> inicioPeriodo.plusMonths(3);
+            case SEMESTRAL -> inicioPeriodo.plusMonths(6);
+            case ANUAL -> inicioPeriodo.plusYears(1);
         };
 
         // Si ya venció (se está registrando un pago antiguo), queda como histórico
