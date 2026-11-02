@@ -4,6 +4,7 @@ import com.gym.gym_app.models.Membresia;
 import com.gym.gym_app.service.MembresiaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,10 +21,18 @@ public class MembresiaController {
     }
 
     @PostMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Membresia> crear(@PathVariable Long usuarioId,
                                            @RequestBody Membresia membresia) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(membresiaService.crearMembresia(usuarioId, membresia));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        membresiaService.deleteMembresia(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/usuario/{usuarioId}/historial")
