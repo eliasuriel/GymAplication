@@ -40,10 +40,8 @@ public class AsistenciaService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Usuario con id " + usuarioId + " no encontrado"));
 
-        // Verificar membresía activa
-        membresiaRepository.findByUsuarioIdAndActivaTrue(usuarioId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "El usuario no tiene una membresía activa"));
+        // La asistencia se registra aunque la membresía esté vencida.
+        // El estado de la membresía solo se muestra en la pantalla de bienvenida.
 
         // Verificar que no haya una entrada sin salida
         asistenciaRepository
