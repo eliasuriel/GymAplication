@@ -46,6 +46,10 @@ public class UsuarioController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioResponse> crear(@Valid @RequestBody UsuarioRequest request) {
+        if (usuarioService.existeCorreo(request.getCorreo())) {
+            throw new IllegalArgumentException("El correo " + request.getCorreo() + " ya está registrado");
+        }
+
         Usuario usuario = new Usuario();
         usuario.setId(request.getId());
         usuario.setNombre(request.getNombre());
