@@ -115,6 +115,14 @@ public class AsistenciaService {
         return asistenciaRepository.findByUsuarioIdOrderByFechaEntradaDesc(usuarioId);
     }
 
+    public List<Asistencia> getAsistenciasPorFecha(LocalDate fecha) {
+        if (fecha.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("No se pueden consultar fechas futuras");
+        }
+        LocalDateTime inicio = fecha.atStartOfDay();
+        return asistenciaRepository.findByFechaEntradaGreaterThanEqualAndFechaEntradaLessThanOrderByFechaEntradaAsc(inicio, inicio.plusDays(1));
+    }
+
     public List<Asistencia> getAsistenciasHoy() {
         LocalDateTime inicioDia = LocalDate.now().atStartOfDay();
         LocalDateTime finDia = inicioDia.plusDays(1);

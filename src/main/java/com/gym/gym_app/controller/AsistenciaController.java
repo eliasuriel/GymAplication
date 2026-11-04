@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +63,12 @@ public class AsistenciaController {
     @PreAuthorize("hasRole('ADMIN')")
     public List<Map<String, Object>> reporteInasistencia(@RequestParam(defaultValue = "7") int dias) {
         return asistenciaService.reporteInasistencia(dias);
+    }
+
+    @GetMapping("/fecha")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Asistencia> porFecha(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        return asistenciaService.getAsistenciasPorFecha(fecha);
     }
 
     @GetMapping("/hoy")

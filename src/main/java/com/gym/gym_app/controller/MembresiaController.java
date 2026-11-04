@@ -8,6 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/membresias")
@@ -26,6 +28,13 @@ public class MembresiaController {
                                            @RequestBody Membresia membresia) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(membresiaService.crearMembresia(usuarioId, membresia));
+    }
+
+    @PatchMapping("/{id}/vencimiento")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Membresia> actualizarVencimiento(@PathVariable Long id,
+                                                           @RequestBody Map<String, LocalDate> datos) {
+        return ResponseEntity.ok(membresiaService.actualizarVencimiento(id, datos.get("fechaVencimiento")));
     }
 
     @DeleteMapping("/{id}")

@@ -14,6 +14,8 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
 
     Optional<Asistencia> findTopByUsuarioIdAndFechaSalidaIsNullOrderByFechaEntradaDesc(Long usuarioId);
 
+    List<Asistencia> findByFechaEntradaGreaterThanEqualAndFechaEntradaLessThanOrderByFechaEntradaAsc(LocalDateTime inicio, LocalDateTime fin);
+
     List<Asistencia> findByFechaEntradaBetween(LocalDateTime inicio, LocalDateTime fin);
 
     boolean existsByUsuarioIdAndFechaEntradaBetween(Long usuarioId, LocalDateTime inicio, LocalDateTime fin);

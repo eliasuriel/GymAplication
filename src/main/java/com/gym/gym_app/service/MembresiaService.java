@@ -60,12 +60,18 @@ public class MembresiaService {
             }
         }
 
-        LocalDate vencimiento = switch (membresia.getTipo()) {
+        LocalDate vencimientoCalculado = switch (membresia.getTipo()) {
             case MENSUAL -> inicioPeriodo.plusMonths(1);
             case TRIMESTRAL -> inicioPeriodo.plusMonths(3);
             case SEMESTRAL -> inicioPeriodo.plusMonths(6);
             case ANUAL -> inicioPeriodo.plusYears(1);
         };
+
+        LocalDate vencimiento = membresia.getFechaVencimiento() != null
+                ? membresia.getFechaVencimiento() : vencimientoCalculado;
+        if (!vencimiento.isAfter(inicio)) {
+            throw new IllegalArgumentException("El vencimiento debe ser posterior a la fecha de pago");
+        }
 
         // Si ya venció (se está registrando un pago antiguo), queda como histórico
         // y NO desplaza a la membresía vigente de la clienta.
@@ -87,6 +93,30 @@ public class MembresiaService {
         membresia.setActiva(vigente);
 
         return membresiaRepository.save(membresia);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public Membresia actualizarVencimiento(Long id, LocalDate nuevaFecha) {
+        Membresia membresia = membresiaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Membresía no encontrada: " + id));
+        if (nuevaFecha == null || !nuevaFecha.isAfter(membresia.getFechaPago())) {
+            throw new IllegalArgumentException("El vencimiento debe ser posterior a la fecha de pago");
+        }
+        membresia.setFechaVencimiento(nuevaFecha);
+        // Garantiza una sola membresía activa, incluso al reactivar una vencida.
+        List<Membresia> historial = membresiaRepository.findByUsuarioId(membresia.getUsuario().getId());
+        LocalDate hoy = LocalDate.now();
+        Membresia vigente = historial.stream()
+                .filter(m -> m.getId().equals(id) || m.isActiva())
+                .filter(m -> !m.getFechaVencimiento().isBefore(hoy))
+                .max(Comparator.comparing(Membresia::getFechaVencimiento)
+                        .thenComparing(Membresia::getId))
+                .orElse(null);
+        for (Membresia m : historial) {
+            m.setActiva(vigente != null && m.getId().equals(vigente.getId()));
+        }
+        membresiaRepository.saveAll(historial);
+        return membresia;
     }
 
     public List<Membresia> getHistorialByUsuario(Long usuarioId) {

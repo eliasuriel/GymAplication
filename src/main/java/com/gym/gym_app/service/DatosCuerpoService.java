@@ -28,6 +28,9 @@ public class DatosCuerpoService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Usuario con id " + usuarioId + " no encontrado"));
 
+        if (datos.getFechaRegistro() != null && datos.getFechaRegistro().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de medición no puede ser futura");
+        }
         datos.setUsuario(usuarioRepository.findById(usuarioId).get());
         return datosCuerpoRepository.save(datos);
     }
