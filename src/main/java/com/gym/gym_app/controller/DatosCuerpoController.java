@@ -57,4 +57,19 @@ public class DatosCuerpoController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(datosCuerpoService.guardar(usuarioId, datos));
     }
+
+    @PutMapping("/admin/{registroId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DatosCuerpo> actualizarComoAdmin(@PathVariable Long registroId,
+                                                           @RequestBody DatosCuerpo cambios) {
+        return ResponseEntity.ok(datosCuerpoService.actualizar(registroId, cambios));
+    }
+
+    @DeleteMapping("/admin/{registroId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminarComoAdmin(@PathVariable Long registroId) {
+        datosCuerpoService.eliminar(registroId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

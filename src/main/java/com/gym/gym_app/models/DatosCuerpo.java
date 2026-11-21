@@ -44,6 +44,9 @@ public class DatosCuerpo {
         if (peso != null && altura != null && altura > 0) {
             this.imc = Math.round((peso / (altura * altura)) * 100.0) / 100.0;
             this.categoria = interpretarImc(this.imc);
+        } else {
+            this.imc = null;
+            this.categoria = null;
         }
         if (this.fechaRegistro == null) {
             this.fechaRegistro = LocalDate.now();

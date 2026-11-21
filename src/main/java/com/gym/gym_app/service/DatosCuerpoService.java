@@ -35,6 +35,38 @@ public class DatosCuerpoService {
         return datosCuerpoRepository.save(datos);
     }
 
+
+    // Administración: actualizar solo los campos editables, sin cambiar el dueño del registro.
+    @org.springframework.transaction.annotation.Transactional
+    public DatosCuerpo actualizar(Long registroId, DatosCuerpo cambios) {
+        DatosCuerpo registro = datosCuerpoRepository.findById(registroId)
+                .orElseThrow(() -> new EntityNotFoundException("Registro de medidas no encontrado: " + registroId));
+        if (cambios.getFechaRegistro() == null || cambios.getFechaRegistro().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de medición debe ser válida y no futura");
+        }
+        registro.setFechaRegistro(cambios.getFechaRegistro());
+        registro.setPeso(cambios.getPeso());
+        registro.setAltura(cambios.getAltura());
+        registro.setMusculo(cambios.getMusculo());
+        registro.setGrasaCorporal(cambios.getGrasaCorporal());
+        registro.setGrasaVisceral(cambios.getGrasaVisceral());
+        registro.setEdadMetabolica(cambios.getEdadMetabolica());
+        registro.setBusto(cambios.getBusto());
+        registro.setCintura(cambios.getCintura());
+        registro.setAbdomen(cambios.getAbdomen());
+        registro.setCadera(cambios.getCadera());
+        registro.setMuslo(cambios.getMuslo());
+        registro.setBrazo(cambios.getBrazo());
+        return datosCuerpoRepository.save(registro);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void eliminar(Long registroId) {
+        DatosCuerpo registro = datosCuerpoRepository.findById(registroId)
+                .orElseThrow(() -> new EntityNotFoundException("Registro de medidas no encontrado: " + registroId));
+        datosCuerpoRepository.delete(registro);
+    }
+
     public List<DatosCuerpo> getHistorial(Long usuarioId) {
         return datosCuerpoRepository.findByUsuarioIdOrderByFechaRegistroDesc(usuarioId);
     }
