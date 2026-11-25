@@ -50,6 +50,12 @@ public class DatosCuerpoController {
         return ResponseEntity.ok(datosCuerpoService.reporteProgresoMensual());
     }
 
+    @GetMapping("/reporte/top5")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> reporteTop5() {
+        return ResponseEntity.ok(datosCuerpoService.reporteTop5());
+    }
+
     @PostMapping("/admin/usuario/{usuarioId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DatosCuerpo> guardarComoAdmin(@PathVariable Long usuarioId,
